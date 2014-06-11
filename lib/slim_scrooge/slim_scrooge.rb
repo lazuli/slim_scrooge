@@ -4,7 +4,7 @@ module SlimScrooge
   module FindBySql
     def self.included(base)
       ActiveRecord::Base.extend ClassMethods
-      ClassMethods.class_variable_set(:@@slim_use_arel, (base.method(:find_by_sql).arity != 1))
+      ClassMethods.send :class_variable_set, :@@slim_use_arel, (base.method(:find_by_sql).arity != 1)
       class << base
         alias_method_chain :find_by_sql, :slim_scrooge
       end
@@ -20,7 +20,7 @@ module SlimScrooge
         else
           callsite_key = SlimScrooge::Callsites.callsite_key(sql)
         end
-        
+
         if SlimScrooge::Callsites.has_key?(callsite_key)
           find_with_callsite_key(sql, callsite_key, binds)
         elsif callsite = SlimScrooge::Callsites.create(sql, callsite_key, name)  # new site that is scroogeable
